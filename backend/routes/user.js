@@ -1,15 +1,21 @@
-/* Ce fichier contient les routes pour authentification */
-
-/* Importation framework Express qui permet de déployer rapidement nos API */
 const express = require('express');
-/* Création router grace à la méthode Router d'Express */
 const router = express.Router();
-
-/* Importation controleur des authentification */
 const userCtrl = require('../controllers/user');
+const auth = require('../middleware/auth');
 
+// Création d'un utilisateur
 router.post('/signup', userCtrl.signup);
+
+// Login d'un utilisateur
 router.post('/login', userCtrl.login);
 
-/* Exportation router, le rendant par là même disponible pour notre application Express */
+// Récupération d'un seul utilisateur
+router.get('/users/:id', auth, userCtrl.getOneUser);
+
+//Suppression d'un utilisateur
+router.delete('/users/:id', auth, userCtrl.deleteOneUser);
+
+// Modification d'un utilisateur
+router.post('/users/:id', auth, userCtrl.modifyUser)
+
 module.exports = router;

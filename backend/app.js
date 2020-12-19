@@ -1,22 +1,27 @@
-// Initialisation de dotenv
-require('dotenv').config()
-
 // Initialisation des dépendances
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
-const helmet = require('helmet');
+
+require('dotenv').config()
 
 // Récupération des routes
 const userRoutes = require('./routes/user');
 const postRoutes = require('./routes/post');
+const commentRoutes = require('./routes/comment');
 
 //Initialisation de l'application avec le framework express
 const app = express();
 
+const { Sequelize } = require('sequelize');
+const { urlencoded } = require('body-parser');
+const { addHook } = require('./models/User');
 
-// Connection à la database
-require("./db_connection");
+const sequelize = new Sequelize(process.env.DATABASE, process.env.DB_USERNAME, process.env.DB_PASSWORD, {
+    host: process.env.HOST,
+    dialect: 'mysql'
+});
+
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -25,11 +30,12 @@ app.use((req, res, next) => {
     next();
 });
 
-
 // Utilisation du body-parser pour les content-type : application/json
 app.use(bodyParser.json());
-app.use(helmet());
 
+sequelize.authenticate()
+.then(() => console.log('Connection to the database has been established succesfully.'))
+.catch(error => console.error('Unable to connect do the database', error));
 
 // Utilisation du path pour enregistrer les images
 app.use('/images', express.static(path.join(__dirname, 'images')));
@@ -37,8 +43,7 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 // Utilisation des routes 
 app.use('/api', userRoutes);
 app.use('/api/posts', postRoutes);
-
-
+app.use('/api/comments', commentRoutes);
 
 // Export de app pour le fichier server.js
 module.exports = app;

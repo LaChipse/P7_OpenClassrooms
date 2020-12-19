@@ -4,40 +4,36 @@ const sequelize = new Sequelize(process.env.DATABASE, process.env.DB_USERNAME, p
     dialect: 'mysql'
 });
 
-const User = sequelize.define('User', {
+const User = require('../models/User');
+
+const Post = sequelize.define('Post', {
     userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         primaryKey: true,
         autoIncrement: true
     },
-    firstName: {
+    content: {
         type: DataTypes.STRING,
         allowNull: false
     },
-    lastName: {
-        type: DataTypes.STRING,
-        allowNull: false
+    createdAt: {
+        type: DataTypes.DATE,
+        allowNull:false,
+        defaultValue: Sequelize.NOW
     },
-    pseudo: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true
-    },
-    password:{
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    
+    updatedAt: {
+        type: DataTypes.DATE,
+        allowNull:false,
+        defaultValue: Sequelize.NOW
+    }
 });
 
+Post.belongsTo(User, {foreignKey: 'creator_Id', onDelete:'cascade'});
+User.hasMany(Post, {foreignKey: 'creator_Id', onDelete:'cascade'});
 
-User.sync()
+Post.sync()
 .then(() => console.log('La table Post a été créée dans la base de donnée'))
 .catch(error => console.error('Une erreur est survenue', error));
 
-module.exports = User;
+module.exports = Post;
