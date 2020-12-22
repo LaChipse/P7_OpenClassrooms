@@ -1,43 +1,20 @@
-const { Sequelize, DataTypes, Model } = require('sequelize');
-const sequelize = new Sequelize(process.env.DATABASE, process.env.DB_USERNAME, process.env.DB_PASSWORD, {
-    host: process.env.HOST,
-    dialect: 'mysql'
-});
+'use strict';
 
-const User = sequelize.define('User', {
-    userId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        primaryKey: true,
-        autoIncrement: true
-    },
-    firstName: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    lastName: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    pseudo: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true
-    },
-    password:{
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    
-});
-
-
-User.sync()
-.then(() => console.log('La table Post a été créée dans la base de donnée'))
-.catch(error => console.error('Une erreur est survenue', error));
-
-module.exports = User;
+module.exports = (sequelize, DataTypes) => {
+  const User = sequelize.define('User', {
+      imageUrl: DataTypes.STRING, 
+      firstName: DataTypes.STRING,
+      lastName: DataTypes.STRING,
+      email: DataTypes.STRING,
+      password: DataTypes.STRING, 
+  });
+  User.associate = function(models) {
+      models.User.hasMany(models.Post,{
+        onDelete:"CASCADE"
+      });
+      models.User.hasMany(models.Comment,{
+        onDelete:"CASCADE"
+      })
+  };
+  return User;
+};

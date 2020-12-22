@@ -1,21 +1,18 @@
+//Importations
 const express = require('express');
 const router = express.Router();
+
 const userCtrl = require('../controllers/user');
+
 const auth = require('../middleware/auth');
-
-// Création d'un utilisateur
-router.post('/signup', userCtrl.signup);
-
-// Login d'un utilisateur
+const multer = require('../middleware/multer-config');
+ 
+//Routes User
+router.post('/signup', multer, userCtrl.signup);
 router.post('/login', userCtrl.login);
+router.get('/', auth, userCtrl.getUser);
+router.put('/', auth, multer, userCtrl.updateUser);
+router.delete('/',auth, userCtrl.deleteUser);
 
-// Récupération d'un seul utilisateur
-router.get('/users/:id', auth, userCtrl.getOneUser);
-
-//Suppression d'un utilisateur
-router.delete('/users/:id', auth, userCtrl.deleteOneUser);
-
-// Modification d'un utilisateur
-router.post('/users/:id', auth, userCtrl.modifyUser)
-
+//Exportation
 module.exports = router;

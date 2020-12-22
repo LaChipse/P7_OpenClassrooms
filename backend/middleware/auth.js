@@ -1,17 +1,19 @@
-const jwt = require("jsonwebtoken")
+const jwt = require('jsonwebtoken');
+const config = require('../config/config.json');
 
 module.exports = (req, res, next) => {
-    try {
-        const token = req.headers.authorization.split(" ")[1]
-        const decodedToken = jwt.verify(token, process.env.RND_TKN)
-        const userId = decodedToken.userId
-        if (req.body.userId && req.body.userId !== userId) {
-            throw "Utilisateur non-reconnu !"
-        } else {
-            next()
-        }
-    } 
-    catch (error) {
-        res.status(401).json({ error: error || "Requête non authentifiée !" })
+  try {
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = jwt.verify(token, config.secret);
+    const userId = decodedToken.userId;
+    if (req.body.userId && req.body.userId !== userId) {
+      return 'UserId non valable';
+    } else {
+      next();
     }
-}
+  } catch {
+    res.status(401).json({
+      error: new Error('Requete non authentifiée!')
+    });
+  }
+};

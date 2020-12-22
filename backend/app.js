@@ -1,28 +1,17 @@
-// Initialisation des dépendances
+//Importations
 const express = require('express');
-const bodyParser = require('body-parser');
-const path = require('path');
+const bodyParser = require("body-parser");
+const path = require("path");
 
-require('dotenv').config()
-
-// Récupération des routes
+//Importations des routes
 const userRoutes = require('./routes/user');
-const postRoutes = require('./routes/post');
-const commentRoutes = require('./routes/comment');
+const userPosts = require('./routes/post');
+const userComment = require('./routes/comment');
 
-//Initialisation de l'application avec le framework express
+//Création de l'app express
 const app = express();
 
-const { Sequelize } = require('sequelize');
-const { urlencoded } = require('body-parser');
-const { addHook } = require('./models/User');
-
-const sequelize = new Sequelize(process.env.DATABASE, process.env.DB_USERNAME, process.env.DB_PASSWORD, {
-    host: process.env.HOST,
-    dialect: 'mysql'
-});
-
-
+//Authorisations requetes
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
@@ -30,20 +19,20 @@ app.use((req, res, next) => {
     next();
 });
 
-// Utilisation du body-parser pour les content-type : application/json
+//Gestion données reçues
 app.use(bodyParser.json());
 
-sequelize.authenticate()
-.then(() => console.log('Connection to the database has been established succesfully.'))
-.catch(error => console.error('Unable to connect do the database', error));
-
-// Utilisation du path pour enregistrer les images
+//Gestion images de manière statique
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
-// Utilisation des routes 
-app.use('/api', userRoutes);
-app.use('/api/posts', postRoutes);
-app.use('/api/comments', commentRoutes);
+//Routeurs à utiliser
+app.use('/api/user', userRoutes);
+app.use('/api/post', userPosts);
+app.use('/api/comment', userComment);
 
-// Export de app pour le fichier server.js
+// SECURITY
+// Protection contre certaines vulnérabilités Web bien connues en définissant les en-têtes HTTP de manière appropriée.
+var helmet = require('helmet');
+app.use(helmet());
+
 module.exports = app;

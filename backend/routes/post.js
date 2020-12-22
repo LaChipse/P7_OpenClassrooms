@@ -1,23 +1,18 @@
+//Importations
 const express = require('express');
 const router = express.Router();
-const userCtrl = require('../controllers/post');
+
 const auth = require('../middleware/auth');
-const multer = require('../middleware/multer-config')
+const multer = require('../middleware/multer-config');
 
-// Récupération de tous les posts 
-router.get('/', auth, userCtrl.getAllPosts);
+const postCtrl = require('../controllers/post');
+ 
+//Routes Posts
+router.post('/', auth, multer, postCtrl.createPost);
+router.get('/', auth, postCtrl.getAllPosts);
+router.get('/:id', auth, postCtrl.getPost);
+router.put('/:id', auth, postCtrl.modifyPost);
+router.delete('/:id', auth, postCtrl.deletePost);
 
-// récupération d'un post 
-router.get('/:id', auth, userCtrl.getOnePost);
-
-// Création d'un post 
-router.post('/create' ,auth, multer,  userCtrl.createOnePost);
-
-// Suppression d'un post 
-router.delete('/:id' , auth, userCtrl.deleteOnePost);
-
-// Modification d'un post 
-router.post('/:id' ,auth, multer, userCtrl.modifyOnePost);
-
-
+//Exportation
 module.exports = router;
