@@ -29,7 +29,7 @@ exports.signup = (req, res) => {
             } else {
                  bcrypt.hash(req.body.password, 10)
                     .then((hash) => {
-                        models.User.create({ ...userObject, password:hash, imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`})
+                        models.User.create({ firstName: userObject.firstName.toLowerCase(), lastName: userObject.lastName.toLowerCase(), email: userObject.email.toLowerCase(), password:hash, imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`})
                         .then(() => { res.status(201).send({ message: 'Profil enregistré !'}) })
                         .catch(error => res.status(400).json({ error }));
                     })
@@ -39,7 +39,7 @@ exports.signup = (req, res) => {
 
 //Connexion utilisateur
 exports.login = (req, res) => {
-    models.User.findOne({ where: { email: req.body.email } })
+    models.User.findOne({ where: { email: req.body.email.toLowerCase() } })
         .then(user => {
             if (!user) {
                 return res.status(400).json({ error: 'Utilisateur non trouvé!' });
