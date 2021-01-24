@@ -22,6 +22,9 @@ app.use((req, res, next) => {
 //Gestion données reçues
 app.use(bodyParser.json());
 
+const db = require("./models")
+db.sequelize.sync()
+
 //Gestion images de manière statique
 app.use('/images', express.static(path.join(__dirname, 'images')));
 

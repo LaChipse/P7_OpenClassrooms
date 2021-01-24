@@ -5,11 +5,13 @@ const sanitizeHtml = require('sanitize-html');
 const config = require('../config/config.json');
 
 //Création d'une publication
-exports.createPost =  (req, res) => {
+exports.createPost =  (req, res, next) => {
     const token = req.headers.authorization.split(' ')[1];
-    result = jwt.verify(token, config.secret);
+    const decodedToken = jwt.verify(token, config.development.secret);
+    const userId = decodedToken.id;
     
-    const postObject = JSON.parse(req.body.post);
+    const postObject = req.body;
+
     let cleanPost = sanitizeHtml(postObject.content,{
         allowedTags: [],
         allowedAttributes: {}
@@ -18,8 +20,8 @@ exports.createPost =  (req, res) => {
     if (cleanPost.length == 0) {
         res.status(400).json({ message: 'Format non valide' })
     } else {
-    models.Post.create({ ...postObject, content: cleanPost, userId: result.id, imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}` })
-        .then(() => { res.status(201).json({ message: 'Publication enregistrée !' }) })
+    models.Post.create({ avatar: postObject.avatar, title: postObject.title, content: cleanPost, UserId: userId, imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}` })
+        .then(() => { res.status(201).json({ message: cleanPost}) })
         .catch(error => res.status(400).json({ error }));
 }}
 
@@ -29,7 +31,10 @@ exports.getAllPosts = (req, res) => {
             include: [{
                 model: models.User,
                 attributes: ['firstName']
-            }]
+            }],
+            order: [
+                ['updatedAt', 'DESC'],
+            ],
         })
         .then(posts => { return res.status(200).send(posts) })
         .catch(error => res.status(400).json({ error }));
@@ -50,32 +55,59 @@ exports.getPost = (req, res) => {
         .catch(error => res.status(400).json({ error }))
 }
 
+//Affichage des publications d'un utilisateur
+exports.getUserPosts = (req, res) => {
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = jwt.verify(token, config.development.secret);
+    const userId = decodedToken.id;
+
+    models.Post.findAll({
+            where: {
+                userId: userId
+            },
+            include: [{
+                model: models.User,
+                attributes: ['firstName', 'id']
+            }],
+            order: [
+                ['updatedAt', 'DESC'],
+            ],
+        })
+        .then(post => { res.status(200).json(post) })
+        .catch(error => res.status(400).json({ error }))
+}
+
+//Modification d'une publication
 exports.modifyPost = async (req, res, next) => {
     const token = req.headers.authorization.split(' ')[1];
-    result = jwt.verify(token, config.secret);
+    const decodedToken = jwt.verify(token, config.development.secret);
+    const userId = decodedToken.id;
   
-    let post = await models.post.findOne({ where: { id: req.params.id } })
+    const post = await models.Post.findOne({ where: { id: req.params.id } })
     
-    if (post.userId == result.id) {
-      models.post.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
-        .then(() => res.status(200).json({ message: 'Commentaire modifié !'}))
-        .catch(error => res.status(400).json({ error }));
+    if (post.userId = userId) {
+        const postObject = req.file ? { imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`, ...req.body } : { ...req.body };
+
+        models.Post.update({ ...postObject}, { where: { id: req.params.id } })
+            .then(() => { res.status(201).json({ postObject }) })
+            .catch(error => res.status(400).json({ error }));
     }
   };
 
 //Suppression d'une publication
 exports.deletePost = async (req, res) => {
     const token = req.headers.authorization.split(' ')[1];
-    result = jwt.verify(token, config.secret);
+    const decodedToken = jwt.verify(token, config.development.secret);
+    const userId = decodedToken.id;
 
-    let post = await models.Post.findOne({ where: { id: req.params.id } })
+    const post = await models.Post.findOne({ where: { id: req.params.id } })
 
-    if (post.userId == result.id) {
+    if (post.userId = userId) {
         models.Comment.destroy({ where: { postId: req.params.id }})
-        const filename = post.imageUrl.split('/images/')[1];
-        fs.unlink(`images/${filename}`, () => {
+        const postFilename = post.imageUrl.split('/images/')[1]
+        fs.unlink(`images/${postFilename}`, () => {
             post.destroy()
-                .then(() => res.status(200).json({ message: 'Publication supprimée!' }))
+                .then(() => res.status(200).json({ message: 'Publication supprimée !' }))
                 .catch(error => res.status(400).json({ error }));
         });
     }

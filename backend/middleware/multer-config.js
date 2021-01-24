@@ -4,7 +4,7 @@ const multer = require('multer');
 //Dictionnaire MIME_TYPES
 const MIME_TYPES = {
   'image/jpg': 'jpg',
-  'image/jpeg': 'jpeg',
+  'image/jpeg': 'jpg',
   'image/png': 'png',
   'image/gif': 'gif'
 };
@@ -17,10 +17,11 @@ const storage = multer.diskStorage({
   filename: (req, file, callback) => {
     const name = file.originalname.split(' ').join('_');
     const ext = MIME_TYPES[file.mimetype];
+    const newName = name.replace('.' + ext, "_");
     if (ext !== 'png' && ext !== 'jpg' && ext !== 'jpeg'  && ext !== 'gif') {
       return callback('Only images are allowed')
     } else {
-    callback(null, name + Date.now() + '.' + ext);
+      callback(null, newName + Date.now() + '.' + ext);
   }}
 });
 

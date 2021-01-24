@@ -1,0 +1,54 @@
+.btn-primary {
+    background-color: #091f42;
+    border-color: #091f42;
+}
+
+.btn-danger {
+    background-color: rgb(208, 80, 89);
+    border-color: rgb(208, 80, 89);
+}
+
+.col-form-label-lg {
+    padding-top: calc(0.9rem + 1px);
+    padding-bottom: 0px;
+}
+
+label {
+    margin-bottom: .2rem;
+}
+
+.navbar {
+    justify-content: start;
+}
+
+.navbar-nav {
+    font-size: 1.2rem;
+}
+
+.navbar-toggler {
+    font-size: 1.5rem;
+}
+
+.nav-link:hover {
+    text-decoration: underline;
+    text-decoration-line: underline;
+    text-decoration-style: solid;
+    text-decoration-color: currentcolor;
+    text-decoration-thickness: auto;
+}
+
+#linkPost {
+    color: rgb(208, 80, 89);
+    text-decoration: none;
+    :hover {
+      color: #a3150d;
+      text-decoration: underline;
+    }
+  }
+
+p {
+    color: black;
+    font-size: 0.6rem;
+    margin-bottom: 10px;
+}
+

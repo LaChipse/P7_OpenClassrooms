@@ -5,10 +5,14 @@ const sanitizeHtml = require('sanitize-html');
 const config = require('../config/config.json');
 
 //Création d'un commentaire
-exports.createComment = (req, res) => {
-    const token = req.headers.authorization.split(' ')[1]; 
-    result = jwt.verify(token, config.secret);
-    let cleanComment = sanitizeHtml(req.body.content, {
+exports.createComment = (req, res, next) => {
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = jwt.verify(token, config.development.secret);
+    const userId = decodedToken.id;
+
+    const postObject = req.body;
+    
+    let cleanComment = sanitizeHtml(postObject.content, {
         allowedTags: [],
         allowedAttributes: {}
     })
@@ -16,8 +20,8 @@ exports.createComment = (req, res) => {
     if (cleanComment.length == 0) {
         res.status(400).json({ message: 'Format non valide' })
     } else {
-    models.Comment.create({ content: cleanComment, userId:result.id, postId: req.params.id })
-        .then(() => { res.status(201).json({ message: 'Commentaire enregistré !'}) })
+    models.Comment.create({ content: cleanComment, UserId: userId, PostId: req.params.id })
+        .then(() => { res.status(201).json({ message: cleanComment}) })
         .catch(error => res.status(400).json({ error }));
     }
 }
@@ -28,10 +32,22 @@ exports.getComments = (req, res) => {
         where: { postId: req.params.id },
         include: [{
             model: models.User,
+            attributes: ['firstName', 'lastName']
+        }]
+    })
+    .then(comment => { res.status(200).json(comment); })
+    .catch((error) => { res.status(400).json({ error }) });
+}
+
+exports.getComment = (req, res) => {
+    models.Comment.findOne({
+        where: { id: req.params.id },
+        include: [{
+            model: models.User,
             attributes: ['firstName']
         }]
     })
-    .then(post => { res.status(200).json(post); })
+    .then(comment => { res.status(200).json(comment); })
     .catch((error) => { res.status(400).json({ error }) });
 }
 

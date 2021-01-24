@@ -3,18 +3,10 @@ const { Sequelize, DataTypes } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
   const Post = sequelize.define('Post', {
-    userId: DataTypes.INTEGER,
     title: DataTypes.STRING,
     content: DataTypes.STRING,
     imageUrl: DataTypes.STRING,
-    postDate: {
-      type: DataTypes.DATE,
-      defaultValue: Sequelize.NOW
-    },
-    modifyDAte: {
-      type: DataTypes.DATE,
-      defaultValue: Sequelize.NOW
-    },
+    avatar: DataTypes.STRING,
   });
   Post.associate = function(models) {
     models.Post.belongsTo(models.User, {
