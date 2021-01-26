@@ -9,9 +9,8 @@
       />
     </b-navbar-brand>
 
-    <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+    <b-navbar-toggle class="ml-auto" target="nav-collapse"></b-navbar-toggle>
 
-    <!-- Right aligned nav items -->
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav class="ml-auto">
         <b-nav-item to="/loggin" right>Connexion</b-nav-item>

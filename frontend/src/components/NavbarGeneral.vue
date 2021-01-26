@@ -1,5 +1,5 @@
 <template>
-  <b-navbar toggleable="lg" id="navbar">
+  <b-navbar toggleable="lg" id="navbar" width="100%">
     <b-navbar-brand to="/accueil">
       <img
         src="../assets/images/icon.png"
@@ -12,7 +12,8 @@
     <b-navbar-brand to="/profil">
       <b-avatar :src="avatar" size="lg" alt="profil_picture"></b-avatar>
     </b-navbar-brand>
-    <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+
+    <b-navbar-toggle target="nav-collapse" class="ml-auto"></b-navbar-toggle>
 
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
@@ -40,67 +41,67 @@
 
         <b-nav-item to="/loggin">Deconnexion</b-nav-item>
       </b-navbar-nav>
-      <div>
-        <b-modal
-          id="modal-publication"
-          ref="modal"
-          title="Editez votre publication"
-          @ok="postPub"
-        >
-          <b-form ref="form">
-            <b-form-group
-              label="Titre de la publication :"
-              label-for="title"
-              valid-feedback="Merci!"
-              invalid-feedback="Un titre d'au moins 3 caractères est requis"
-              :state="stateTitle"
-            >
-              <b-form-input
-                v-model="title"
-                id="title"
-                type="text"
-                :state="stateTitle"
-                required
-              ></b-form-input>
-            </b-form-group>
-
-            <b-form-group
-              label="Description de la publication :"
-              label-for="content"
-              valid-feedback="Merci!"
-              invalid-feedback="Une description d'au moins 9 caractères est requise"
-              :state="stateContent"
-            >
-              <b-form-textarea
-                v-model="content"
-                id="content"
-                type="text"
-                rows="4"
-                :state="stateContent"
-                required
-              ></b-form-textarea>
-            </b-form-group>
-            <b-form-group
-              label="Importez votre publication :"
-              label-for="publication"
-              valid-feedback="Merci!"
-              invalid-feedback="Une image est requise"
-              :state="Boolean(imgPost)"
-            >
-              <b-form-file
-                v-model="imgPost"
-                id="publication"
-                accept="image/png, image/jpeg, image/gif"
-                type="file"
-                :state="Boolean(imgPost)"
-                plain
-                required
-              ></b-form-file>
-            </b-form-group>
-          </b-form>
-        </b-modal>
-      </div>
     </b-collapse>
+    <div>
+      <b-modal
+        id="modal-publication"
+        ref="modal"
+        title="Editez votre publication"
+        @ok.prevent="postPub"
+      >
+        <b-form ref="form">
+          <b-form-group
+            label="Titre de la publication :"
+            label-for="title"
+            valid-feedback="Merci!"
+            invalid-feedback="Un titre d'au moins 3 caractères est requis"
+            :state="stateTitle"
+          >
+            <b-form-input
+              v-model="title"
+              id="title"
+              type="text"
+              :state="stateTitle"
+              required
+            ></b-form-input>
+          </b-form-group>
+
+          <b-form-group
+            label="Description de la publication :"
+            label-for="content"
+            valid-feedback="Merci!"
+            invalid-feedback="Une description d'au moins 9 caractères est requise"
+            :state="stateContent"
+          >
+            <b-form-textarea
+              v-model="content"
+              id="content"
+              type="text"
+              rows="4"
+              :state="stateContent"
+              required
+            ></b-form-textarea>
+          </b-form-group>
+          <b-form-group
+            label="Importez votre publication :"
+            label-for="publication"
+            valid-feedback="Merci!"
+            invalid-feedback="Une image est requise"
+            :state="Boolean(imgPost)"
+          >
+            <b-form-file
+              v-model="imgPost"
+              id="publication"
+              accept="image/png, image/jpeg, image/gif"
+              type="file"
+              :state="Boolean(imgPost)"
+              plain
+              required
+            ></b-form-file>
+          </b-form-group>
+        </b-form>
+      </b-modal>
+    </div>
   </b-navbar>
 </template>
 
@@ -139,9 +140,8 @@ export default {
       });
   },
   methods: {
-    postPub(ev) {
-      ev.preventDefault();
-      if (!this.title || !this.content || !this.imgPost) {
+    postPub() {
+      if (this.title.length < 3 || this.content.length < 9 || !this.imgPost) {
         return;
       } else {
         const formData = new FormData();
@@ -154,15 +154,12 @@ export default {
             authorization: "bearer " + localStorage.getItem("token"),
           },
         });
-        this.handleSubmit();
+        this.$nextTick(() => {
+          setTimeout(function () {
+            location.reload();
+          }, 500);
+        });
       }
-    },
-    handleSubmit() {
-      this.$nextTick(() => {
-        setTimeout(function () {
-          location.reload();
-        }, 300);
-      });
     },
   },
 };

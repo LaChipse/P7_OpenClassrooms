@@ -1,7 +1,7 @@
 <template>
   <div class="accueil">
-    <NavbarGeneral/>
-    <Accueil/>
+    <NavbarGeneral />
+    <Accueil />
   </div>
 </template>
 

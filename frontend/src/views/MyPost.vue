@@ -1,7 +1,7 @@
 <template>
   <div class="post">
-    <NavbarGeneral/>
-    <PostsUser/>
+    <NavbarGeneral />
+    <PostsUser />
   </div>
 </template>
 

@@ -18,12 +18,13 @@ const storage = multer.diskStorage({
     const name = file.originalname.split(' ').join('_');
     const ext = MIME_TYPES[file.mimetype];
     const newName = name.replace('.' + ext, "_");
-    if (ext !== 'png' && ext !== 'jpg' && ext !== 'jpeg'  && ext !== 'gif') {
+    if (ext !== 'png' && ext !== 'jpg' && ext !== 'jpeg' && ext !== 'gif') {
       return callback('Only images are allowed')
     } else {
       callback(null, newName + Date.now() + '.' + ext);
-  }}
+    }
+  }
 });
 
 //Exportation
-module.exports = multer({storage: storage}).single('image');
+module.exports = multer({ storage: storage }).single('image');

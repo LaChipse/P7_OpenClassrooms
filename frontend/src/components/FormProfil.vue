@@ -1,68 +1,74 @@
 <template>
   <b-container class="mt-4 pt-4">
-    <b-row class="mt-4" align-v="center">
-      <b-col cols="4">
+    <b-row class="mt-4 d-flex text-center">
+      <b-col class="d-flex justify-content-around">
         <b-img
           id="img_profil"
           rounded
+          alt="Circle image profil"
           :src="user.imageUrl"
-          width="250%"
-          height="250%"
+          fluid
           class="ml-1"
         >
         </b-img>
       </b-col>
-      <b-col cols="6">
+      <b-col sm="6" class="mt-4">
         <b-form-group
-          label-cols="4"
-          label-cols-lg="3"
           label-size="lg"
-          label="Nom :"
+          label="Nom : "
           label-for="nom"
+          class="d-flex"
         >
-          <p class="mt-3" variant="warning">{{ user.lastName }}</p>
+          <p class="mt-3 ml-2" variant="warning">{{ user.lastName }}</p>
         </b-form-group>
 
         <b-form-group
-          label-cols="4"
-          label-cols-lg="3"
           label-size="lg"
           label="Prenom : "
           label-for="Prenom"
+          class="d-flex"
         >
-          <p class="mt-3">{{ user.firstName }}</p>
+          <p class="mt-3 ml-2">{{ user.firstName }}</p>
         </b-form-group>
 
         <b-form-group
-          label-cols="4"
-          label-cols-lg="3"
           label-size="lg"
           label="Email : "
           label-for="Email"
+          class="d-flex"
         >
-          <p class="mt-3">{{ user.email }}</p>
+          <p class="mt-3 ml-2">{{ user.email }}</p>
         </b-form-group>
 
         <b-form-group
-          label-cols="4"
-          label-cols-lg="4"
           label-size="lg"
           label="Publications : "
           label-for="Email"
+          class="d-flex"
         >
-          <p class="mt-3">{{ posts.length }}</p>
+          <p class="mt-3 ml-2">{{ posts.length }}</p>
         </b-form-group>
       </b-col>
     </b-row>
-    <b-row class="mt-4 text-center">
-      <b-col cols="10" class="d-flex justify-content-around">
-        <b-button type="button" variant="primary" v-b-modal.modal-avatar
-          >Modifier la photo de profil</b-button
-        >
-        <b-button type="submit" variant="danger" v-b-modal.modal-deleteProfil
-          >Supprimer le profil</b-button
-        >
-        <b-button>Voir mes publications</b-button>
+    <b-row class="mt-4 d-flex justify-content-around text-center">
+      <b-col lg="10" xl="8" class="d-flex justify-content-around">
+        <b-col>
+          <b-button type="button" variant="primary" v-b-modal.modal-avatar
+            >Modifier l'avatar</b-button
+          >
+        </b-col>
+
+        <b-col>
+          <b-button type="button" variant="danger" v-b-modal.modal-deleteProfil
+            >Supprimer le profil</b-button
+          >
+        </b-col>
+
+        <b-col>
+          <b-button type="button" to="/profil/post"
+            >Voir mes publications</b-button
+          >
+        </b-col>
       </b-col>
     </b-row>
     <div>
@@ -188,16 +194,30 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.container,
-.container-lg,
-.container-md,
 .container-sm,
 .container-xl {
-  max-width: 70%;
+  max-width: 90%;
+}
+
+.container-md {
+  max-width: 80%;
 }
 
 p {
   font-size: 1.2rem;
   color: black;
+}
+
+.img-fluid {
+  width: 350px;
+  height: 300px;
+}
+
+.rounded {
+  border-radius: 5rem !important;
+  border-top-left-radius: 5rem;
+  border-top-right-radius: 5rem;
+  border-bottom-right-radius: 5rem;
+  border-bottom-left-radius: 5rem;
 }
 </style>

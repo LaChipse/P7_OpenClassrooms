@@ -62,16 +62,16 @@ exports.getUser = (req, res, next) => {
 
 //Modifier photo de profil
 exports.updateUser = async (req, res, next) => {
-    
+
     user = await models.User.findOne({ where: { id: req.params.id } })
     const filename = user.imageUrl.split('/images/')[1]
     fs.unlink(`images/${filename}`, () => {
 
-    const userObject = req.file ? { imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}` } : { ...req.body };
+        const userObject = req.file ? { imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}` } : { ...req.body };
 
-    models.User.update({ ...userObject}, { where: { id: req.params.id } })
-        .then(() => { res.status(201).json({ userObject }) })
-        .catch(error => res.status(400).json({ error }));
+        models.User.update({ ...userObject }, { where: { id: req.params.id } })
+            .then(() => { res.status(201).json({ userObject }) })
+            .catch(error => res.status(400).json({ error }));
     })
 }
 
@@ -80,7 +80,7 @@ exports.deleteUser = async (req, res) => {
 
     await models.Comment.destroy({ where: { userId: req.params.id } })
 
-    const posts = await models.Post.findAll({where: { userId: req.params.id } })
+    const posts = await models.Post.findAll({ where: { userId: req.params.id } })
     posts.forEach(post => {
         const postFilename = post.imageUrl.split('/images/')[1]
         fs.unlink(`images/${postFilename}`, () => {

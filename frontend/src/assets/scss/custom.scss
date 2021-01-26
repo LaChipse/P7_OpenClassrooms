@@ -52,3 +52,19 @@ p {
     margin-bottom: 10px;
 }
 
+.page-link {
+    color: #091f42;
+}
+
+.page-item.active .page-link {
+    z-index: 3;
+    color: #fff;
+    background-color:  #091f42;
+    border-color:  #091f42;
+}
+
+.img-fluid {
+    width: 450px;
+    height: 350px;
+}
+

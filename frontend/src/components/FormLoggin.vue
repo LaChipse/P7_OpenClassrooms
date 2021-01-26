@@ -1,7 +1,7 @@
 <template>
   <b-container>
     <b-row align-h="center" align-v="center">
-      <b-col class="mt-4 pt-4" cols="6">
+      <b-col class="mt-4 pt-4" md="8" lg="6">
         <b-form method="POST" @submit.prevent="envoi">
           <b-form-group
             id="input-group-1"

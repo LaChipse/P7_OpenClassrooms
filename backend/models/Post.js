@@ -8,13 +8,13 @@ module.exports = (sequelize, DataTypes) => {
     imageUrl: DataTypes.STRING,
     avatar: DataTypes.STRING,
   });
-  Post.associate = function(models) {
+  Post.associate = function (models) {
     models.Post.belongsTo(models.User, {
-    foreignKey: models.User.userId
-  });
-  models.Post.hasMany(models.Comment,{
-    onDelete:"CASCADE"
-  })
+      foreignKey: models.User.userId
+    });
+    models.Post.hasMany(models.Comment, {
+      onDelete: "CASCADE"
+    })
   }
   return Post;
 }

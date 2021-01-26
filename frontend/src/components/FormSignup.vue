@@ -1,8 +1,8 @@
 <template>
   <b-container>
     <b-row align-h="center">
-      <b-col class="mt-4" cols="6">
-        <b-form method="POST" @submit.prevent="envoi">
+      <b-col class="mt-4" md="8" lg="6">
+        <b-form @submit.prevent="sendSignup">
           <b-form-group
             id="input-prenom"
             label-size="lg"
@@ -136,7 +136,7 @@ export default {
     },
   },
   methods: {
-    envoi: function (e) {
+    sendSignup: function (e) {
       if (
         !this.statePrenom ||
         !this.stateNom ||
@@ -152,7 +152,7 @@ export default {
           .then(() => {
             console.log("Inscription réussi !");
             alert("Félicitation vous êtes désormais inscrit");
-            window.location.href = "http://localhost:8080//#/loggin";
+            window.location.href = "http://localhost:8080/loggin";
           })
           .catch(() => console.log("Echec de l'inscription"));
       }

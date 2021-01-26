@@ -9,7 +9,15 @@
               ><strong>{{ post.title }}</strong>
             </h2>
             <div class="d-flex justify-content-around">
-              <b-img :id="post.id" :src="post.imageUrl" fluid rounded></b-img>
+              <acronym :title="post.content">
+                <b-img
+                  :id="post.id"
+                  :src="post.imageUrl"
+                  :alt="post.content"
+                  fluid
+                  rounded
+                ></b-img>
+              </acronym>
             </div>
             <div class="d-flex justify-content-between mt-1">
               <p class="mr-1">
@@ -65,12 +73,13 @@
               <div v-for="(objet, id) in comments" :key="id" class="mt-1">
                 <div class="d-flex">
                   <b-avatar
-                    :src="post.avatar"
+                    :src="comments[id].User.imageUrl"
                     size="2rem"
                     class="mr-2 mb-1"
                   ></b-avatar>
                   <p class="mt-2">
-                   {{ comments[id].User.firstName }} {{ comments[id].User.lastName}}
+                    {{ comments[id].User.firstName }}
+                    {{ comments[id].User.lastName }}
                   </p>
                 </div>
                 <div
@@ -78,9 +87,35 @@
                   class="border border-dark pt-2 pl-2 pr-2 mb-4 rounded text-break"
                 >
                   {{ comments[id].content }}
-                  <p class="mt-3">
-                    {{ comments[id].updatedAt | moment("DD/MM/YY à H:mm") }}
-                  </p>
+                  <div class="d-flex justify-content-between">
+                    <p class="mt-4">
+                      {{ comments[id].updatedAt | moment("DD/MM/YY à H:mm") }}
+                    </p>
+                    <div v-if="comments[id].UserId === user.id">
+                      <b-button
+                        size="sm"
+                        v-on:click="getId(comments[id].id)"
+                        class="buttonCom my-2 mr-1 mt-3"
+                        type="button"
+                        id="comments[id].id"
+                        variant="danger"
+                        v-b-modal.modal-deleteCom
+                        >Supprimer</b-button
+                      >
+                      <b-button
+                        size="sm"
+                        v-on:click="
+                          getId(comments[id].id),
+                            getContent(comments[id].content)
+                        "
+                        class="buttonCom my-2 mt-3"
+                        type="button"
+                        variant="primary"
+                        v-b-modal.modal-modifyCom
+                        >Modifier</b-button
+                      >
+                    </div>
+                  </div>
                 </div>
               </div>
             </b-collapse>
@@ -88,7 +123,7 @@
         </b-col>
       </b-row>
       <div>
-        <b-modal id="modal-deletePub" ref="modal" @ok="deletePost()">
+        <b-modal id="modal-deletePub" ref="modal" @ok="deletePost">
           <h4>Etes vous sur ? Cette action est irréversible</h4>
         </b-modal>
       </div>
@@ -97,7 +132,7 @@
           id="modal-updatePost"
           ref="modal"
           title="Modifier votre publication :"
-          @ok="handleUpdate"
+          @ok.prevent="updatePost"
           @hidden="remove"
         >
           <b-form ref="form">
@@ -112,10 +147,25 @@
                 v-model="title"
                 id="title"
                 type="text"
-                :placeholder="this.title"
                 :state="stateTitle"
                 required
               ></b-form-input>
+            </b-form-group>
+            <b-form-group
+              label="Description de la publication :"
+              label-for="content"
+              valid-feedback="Merci!"
+              invalid-feedback="Une description d'au moins 9 caractères est requise"
+              :state="stateContent"
+            >
+              <b-form-textarea
+                v-model="contentPost"
+                id="content"
+                type="text"
+                rows="4"
+                :state="stateContent"
+                required
+              ></b-form-textarea>
             </b-form-group>
             <b-form-group
               label="Changer votre publication :"
@@ -137,13 +187,34 @@
         <b-modal
           id="modal-addComment"
           ref="modal"
-          @ok="addComment"
+          @ok.prevent="addComment"
           @hidden="removeComment"
         >
           <b-form ref="form">
             <b-form-group label="Ecrivez votre commentaire :" label-for="text">
               <b-form-textarea
-                v-model="content"
+                v-model="contentCom"
+                id="content"
+                type="text"
+                rows="4"
+                required
+              ></b-form-textarea>
+            </b-form-group>
+          </b-form>
+        </b-modal>
+      </div>
+      <div>
+        <b-modal id="modal-deleteCom" ref="modal" @ok="deleteCom">
+          <h4>Supprimer le commentaire ?</h4>
+        </b-modal>
+      </div>
+      <div>
+        <b-modal id="modal-modifyCom" ref="modal" @ok.prevent="modifyCom">
+          <b-form ref="form">
+            <b-form-group label="Ecrivez votre commentaire :" label-for="text">
+              <b-form-textarea
+                v-model="contentCom"
+                placeholder="ok"
                 id="content"
                 type="text"
                 rows="4"
@@ -168,12 +239,16 @@ export default {
       comments: "",
       title: "",
       imgPost: null,
-      content: "",
+      contentCom: "",
+      contentPost: "",
     };
   },
   computed: {
     stateTitle() {
       return this.title.length >= 3;
+    },
+    stateContent() {
+      return this.contentPost.length >= 9;
     },
   },
   created() {
@@ -184,7 +259,9 @@ export default {
         },
       })
       .then((response) => {
-        (this.post = response.data), (this.title = response.data.title);
+        (this.post = response.data),
+          (this.title = response.data.title),
+          (this.contentPost = response.data.content);
       })
       .catch((err) => {
         this.errors.push(err);
@@ -197,7 +274,6 @@ export default {
       })
       .then((response) => {
         this.user = response.data;
-        console.log(this.user);
       })
       .catch((err) => {
         this.errors.push(err);
@@ -213,13 +289,18 @@ export default {
       )
       .then((response) => {
         this.comments = response.data;
-        console.log(response.data);
       })
       .catch((err) => {
         this.errors.push(err);
       });
   },
   methods: {
+    getId(id) {
+      localStorage.setItem("comId", id);
+    },
+    getContent(Content) {
+      this.contentCom = Content;
+    },
     deletePost() {
       axios
         .delete(
@@ -234,19 +315,19 @@ export default {
           console.log(response);
         })
         .catch((err) => console.log(err));
-      window.location.href = "http://localhost:8080//#/accueil";
+      window.location.href = "http://localhost:8080/accueil";
     },
     remove() {
       this.imgPost = null;
     },
-    handleUpdate(e) {
-      e.preventDefault();
-      if (this.title < 3) {
+    updatePost() {
+      if (this.title.length < 3 || this.contentPost.length < 9) {
         return;
       } else {
         const formData = new FormData();
         formData.append("title", this.title);
         formData.append("image", this.imgPost);
+        formData.append("content", this.contentPost);
         axios
           .put(
             "http://localhost:3000/api/post/" + localStorage.getItem("imgId"),
@@ -260,19 +341,16 @@ export default {
           .then((response) => {
             console.log(response);
           })
-          .catch((err) => {
-            this.errors.push(err);
-          });
+          .catch((err) => console.log(err));
         this.handleSubmit();
       }
     },
     removeComment() {
       this.content = "";
     },
-    addComment(e) {
-      e.preventDefault();
-      let contents = new Object();
-      contents.content = this.content;
+    addComment() {
+      const contents = new Object();
+      contents.content = this.contentCom;
       axios
         .post(
           "http://localhost:3000/api/comment/" + localStorage.getItem("imgId"),
@@ -289,6 +367,41 @@ export default {
         .catch((err) => {
           this.errors.push(err);
         });
+      this.handleSubmit();
+    },
+    deleteCom() {
+      axios
+        .delete(
+          "http://localhost:3000/api/comment/" + localStorage.getItem("comId"),
+          {
+            headers: {
+              authorization: "bearer " + localStorage.getItem("token"),
+            },
+          }
+        )
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((err) => console.log(err));
+      this.handleSubmit();
+    },
+    modifyCom() {
+      let contents = new Object();
+      contents.content = this.contentCom;
+      axios
+        .put(
+          "http://localhost:3000/api/comment/" + localStorage.getItem("comId"),
+          contents,
+          {
+            headers: {
+              authorization: "bearer " + localStorage.getItem("token"),
+            },
+          }
+        )
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((err) => console.log(err));
       this.handleSubmit();
     },
     handleSubmit() {
@@ -321,5 +434,9 @@ export default {
 #commentaire {
   font-size: 1rem;
   color: black;
+}
+
+.buttonCom {
+  font-size: 0.6rem;
 }
 </style>
