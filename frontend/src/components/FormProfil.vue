@@ -85,7 +85,7 @@
         id="modal-avatar"
         ref="modal"
         title="Choisissez votre photo de profil :"
-        @ok="handleOk"
+        @ok.prevent="changeAvatar"
         @hidden="remove"
       >
         <form ref="form">
@@ -97,7 +97,7 @@
             <b-form-file
               v-model="avatar"
               id="avatar"
-              accept="image/png, image/jpeg"
+              accept="image/png, image/jpeg, image/gif"
               plain
             ></b-form-file>
           </b-form-group>
@@ -164,9 +164,8 @@ export default {
     remove() {
       (this.title = ""), (this.imgPost = null);
     },
-    handleOk(bvModalEvt) {
+    changeAvatar() {
       // Prevent modal from closing
-      bvModalEvt.preventDefault();
       const formData = new FormData();
       formData.append("image", this.avatar);
       axios.put(
@@ -183,7 +182,6 @@ export default {
     },
     handleSubmit() {
       this.$nextTick(() => {
-        this.$bvModal.hide("modal-avatar");
         setTimeout(function () {
           location.reload();
         }, 500);

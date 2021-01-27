@@ -5,6 +5,7 @@ const { Sequelize, DataTypes } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
     const Comment = sequelize.define('Comment', {
         content: DataTypes.STRING,
+        avatarCom: DataTypes.STRING,
     });
     Comment.associate = function (models) {
         models.Comment.belongsTo(models.Post, { foreignKey: models.Post.postId });

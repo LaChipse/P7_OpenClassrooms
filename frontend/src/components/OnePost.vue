@@ -73,7 +73,7 @@
               <div v-for="(objet, id) in comments" :key="id" class="mt-1">
                 <div class="d-flex">
                   <b-avatar
-                    :src="comments[id].User.imageUrl"
+                    :src="comments[id].avatarCom"
                     size="2rem"
                     class="mr-2 mb-1"
                   ></b-avatar>
@@ -238,6 +238,7 @@ export default {
       user: "",
       comments: "",
       title: "",
+      avatarCom : "",
       imgPost: null,
       contentCom: "",
       contentPost: "",
@@ -274,6 +275,7 @@ export default {
       })
       .then((response) => {
         this.user = response.data;
+        this.avatarCom = response.data.imageUrl;
       })
       .catch((err) => {
         this.errors.push(err);
@@ -349,12 +351,13 @@ export default {
       this.content = "";
     },
     addComment() {
-      const contents = new Object();
-      contents.content = this.contentCom;
+      const comments= new Object();
+      comments.content = this.contentCom;
+      comments.avatarCom = this.avatarCom
       axios
         .post(
           "http://localhost:3000/api/comment/" + localStorage.getItem("imgId"),
-          contents,
+          comments,
           {
             headers: {
               authorization: "bearer " + localStorage.getItem("token"),
@@ -408,7 +411,7 @@ export default {
       this.$nextTick(() => {
         setTimeout(function () {
           location.reload();
-        }, 300);
+        }, 500);
       });
     },
   },

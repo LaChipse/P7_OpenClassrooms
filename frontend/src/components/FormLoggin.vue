@@ -74,7 +74,7 @@ export default {
           console.log("Connexion réussite !");
           localStorage.setItem("id", response.data.userId);
           localStorage.setItem("token", response.data.token);
-          window.location.href = "http://localhost:8080//#/accueil";
+          window.location.href = "http://localhost:8080/accueil";
         })
         .catch((err) => {
           this.dataLog.error = err.response.data;

@@ -71,7 +71,7 @@ exports.getUserPosts = (req, res) => {
             attributes: ['firstName', 'id']
         }],
         order: [
-            ['updatedAt', 'DESC'],
+            ['createdAt', 'DESC'],
         ],
     })
         .then(post => { res.status(200).json(post) })
@@ -94,10 +94,11 @@ exports.modifyPost = async (req, res, next) => {
     if (cleanPost.length == 0) {
         res.status(400).json({ message: 'Format non valide' })
     } else {
-        let post = await models.Post.findOne({ where: { id: req.params.id } })
+        const post = await models.Post.findOne({ where: { id: req.params.id } })
 
         if (post.userId = userId) {
-            const postObject = req.file ?  { imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`, title: postReq.title, content: cleanPost } : { ...req.body };
+            const postFilename = post.imageUrl.split('/images/')[1]
+            const postObject = req.file ?  (fs.unlink(`images/${postFilename}`,()=>{}), { imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`, title: postReq.title, content: cleanPost }) : { ...req.body };
 
             models.Post.update({ ...postObject }, { where: { id: req.params.id } })
                 .then(() => { res.status(201).json({ postObject }) })
@@ -105,6 +106,7 @@ exports.modifyPost = async (req, res, next) => {
         }
     }
 };
+
 
 //Suppression d'une publication
 exports.deletePost = async (req, res) => {

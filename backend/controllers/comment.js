@@ -21,7 +21,7 @@ exports.createComment = (req, res, next) => {
     if (cleanComment.length == 0) {
         res.status(400).json({ message: 'Format non valide' })
     } else {
-        models.Comment.create({ content: cleanComment, UserId: userId, PostId: req.params.id })
+        models.Comment.create({ content: cleanComment, avatarCom: postObject.avatarCom, UserId: userId, PostId: req.params.id })
             .then(() => { res.status(201).json({ message: cleanComment }) })
             .catch(error => res.status(400).json({ error }));
     }
@@ -30,12 +30,12 @@ exports.createComment = (req, res, next) => {
 //Récupération des commentaires d'un post
 exports.getComment = (req, res) => {
     models.Comment.findAll({
-        where: { postId: req.params.id },
+        where: { PostId: req.params.id },
         include: [{
             model: models.User,
-            attributes: ['firstName', 'lastName', 'imageUrl']
+            attributes: ['firstName', 'lastName']
         }], order: [
-            ['updatedAt', 'DESC'],
+            ['createdAt', 'DESC'],
         ],
     })
         .then(comment => { res.status(200).json(comment); })
